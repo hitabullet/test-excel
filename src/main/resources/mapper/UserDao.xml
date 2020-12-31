@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glaway.excel.dao.UserDao">
+
+    <resultMap  id="UserMap"          type="com.glaway.excel.entity.User" >
+        <result property="id"         column="ID"          jdbcType="VARCHAR"/>
+        <result property="name"       column="NAME"        jdbcType="VARCHAR"/>
+        <result property="sex"        column="SEX"         jdbcType="INTEGER"/>
+        <result property="age"        column="AGE"         jdbcType="INTEGER"/>
+        <result property="createTime" column="CREATE_TIME" jdbcType="TIMESTAMP"/>
+        <result property="status"     column="STATUS"      jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMap">
+        select
+          ID, NAME, SEX, AGE, CREATE_TIME, STATUS
+        from test.user
+        where ID = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserMap">
+        select
+          ID, NAME, SEX, AGE, CREATE_TIME, STATUS
+        from test.user
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="UserMap">
+        select
+        ID, NAME, SEX, AGE, CREATE_TIME, STATUS
+        from test.user
+        <where>
+            <if test="id != null and id != ''">
+                and ID = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and NAME = #{name}
+            </if>
+            <if test="sex != null">
+                and SEX = #{sex}
+            </if>
+            <if test="age != null">
+                and AGE = #{age}
+            </if>
+            <if test="createTime != null">
+                and CREATE_TIME = #{createTime}
+            </if>
+            <if test="status != null">
+                and STATUS = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="saveEasyExcelData">
+        INSERT INTO test.user(ID,NAME, SEX, AGE,
+        CREATE_TIME, STATUS)
+        VALUES
+        <foreach collection="userList" item="userList" separator=",">
+            (
+            #{userList.id, jdbcType=VARCHAR},
+            #{userList.name, jdbcType=VARCHAR},
+            #{userList.sex, jdbcType=INTEGER},
+            #{userList.age, jdbcType=INTEGER},
+            #{userList.createTime},
+            #{userList.status, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into test.user(ID,NAME, SEX, AGE, CREATE_TIME, STATUS)
+        values (#{id},#{name}, #{sex}, #{age,jdbcType=INTEGER}, #{createTime}, #{status,jdbcType=INTEGER})
+    </insert>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update test.user
+        <set>
+            <if test="name != null and name != ''">
+                NAME = #{name},
+            </if>
+            <if test="sex != null and sex != ''">
+                SEX = #{sex},
+            </if>
+            <if test="age != null">
+                AGE = #{age},
+            </if>
+            <if test="createTime != null">
+                CREATE_TIME = #{createTime},
+            </if>
+            <if test="status != null">
+                STATUS = #{status},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from test.user where ID = #{id}
+    </delete>
+
+</mapper>
